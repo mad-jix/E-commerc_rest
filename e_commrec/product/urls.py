@@ -1,10 +1,10 @@
 from django.urls import path, include
 
-from rest_framework.routers import DefaultRouter
 
-from .views import ProductsListView
+from .views import ProductsListView,ProductsDetailView
 
 
 urlpatterns = [
     path('products/',ProductsListView.as_view(),name = "products"),
+    path('detailview/<int:id>/',ProductsDetailView.as_view(),name = "product-detail"),
 ]

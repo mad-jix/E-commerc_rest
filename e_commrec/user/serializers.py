@@ -2,11 +2,11 @@ from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 
-from .models import Coustomer
+from .models import Customer
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Coustomer
+        model = Customer
         fields = ['username', 'email']
 
 
