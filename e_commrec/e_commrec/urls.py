@@ -29,6 +29,7 @@ urlpatterns = [
     path('api/users/',include('user.urls')),
     path('api/products/',include('product.urls')),
     path('api/cart/',include('cart.urls')),
+    path('api/order/',include('orders.urls')),
     path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='docs'),
     
 ]

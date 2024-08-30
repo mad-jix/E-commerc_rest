@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'user',
     'product',
     'cart',
+    'orders',
     #third party
     'rest_framework',
     'rest_framework.authtoken',

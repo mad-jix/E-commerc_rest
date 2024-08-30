@@ -13,6 +13,7 @@ from .serializers import UserSerializer,SignupSerializer,LoginSerializer
 
 # Create your views here.
 class SignupView(APIView):
+    serializer_class = SignupSerializer
     permission_classes = [permissions.AllowAny]
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
@@ -22,6 +23,7 @@ class SignupView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
+    serializer_class = LoginSerializer
     permission_classes = [permissions.AllowAny]
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
