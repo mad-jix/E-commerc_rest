@@ -1,20 +1,35 @@
-from django.shortcuts import render
 from django.contrib.auth.models import  User
-from django.contrib.auth import authenticate,login
+from django.contrib.auth import authenticate
 
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import permissions, viewsets
+
+from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
-from .serializers import UserSerializer,SignupSerializer,LoginSerializer
+
+from .serializers import SignupSerializer,LoginSerializer
 
 # Create your views here.
-class SignupView(APIView):
+class UserSignupView(APIView):
     serializer_class = SignupSerializer
     permission_classes = [permissions.AllowAny]
+    @swagger_auto_schema(
+        request_body=SignupSerializer,
+        responses={
+            200: openapi.Response('User created  successful', examples={
+                'application/json': {
+                    'message': 'User created successful'
+                }
+            }),
+            400: openapi.Response('Bad Request'),
+            401: openapi.Response('Unauthorized')
+        }
+    )
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
@@ -22,9 +37,26 @@ class SignupView(APIView):
             return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LoginView(APIView):
+class UserLoginView(APIView):
     serializer_class = LoginSerializer
     permission_classes = [permissions.AllowAny]
+   
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={
+            200: openapi.Response('Login successful', examples={
+                'application/json': {
+                    'refresh': 'string',
+                    'access': 'string',
+                    'token': 'string',
+                    'message': 'Login successful'
+                }
+            }),
+            400: openapi.Response('Bad Request'),
+            401: openapi.Response('Unauthorized')
+        }
+    )
+
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -32,7 +64,14 @@ class LoginView(APIView):
             password = serializer.validated_data['password']
             user = authenticate(username=username, password=password)
             if user is not None:
-                token, created= Token.objects.get_or_create(user=user)
-                return Response({"message": "Login successful" ,"token":token.key} ,status=status.HTTP_200_OK)
+                refresh = RefreshToken.for_user(user)
+                token, created = Token.objects.get_or_create(user=user)
+
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'token': token.key,
+                    'message': 'Login successful'
+                }, status=status.HTTP_200_OK)
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
